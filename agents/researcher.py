@@ -1,6 +1,6 @@
-#"""Research agent that combines RAG retrieval with live web search."""
+#"""Skills Assessment Agent for evaluating professional competencies."""
 
-# Agent 2
+# Agent 2: Skills Assessment Agent
 from __future__ import annotations
 
 from typing import Any, Iterable, Optional
@@ -10,30 +10,33 @@ from crewai import Agent
 from config.settings import build_crewai_llm
 
 SYSTEM_PROMPT = (
-    """Add system prompt content here."""
-    # "You are the Research Specialist for the workshop. "
-    # "Synthesize information from the local RAG knowledge base and the live web. "
-    # "Validate claims, cite sources, and prepare concise bullet summaries for downstream teams."
+    """You are an expert Skills Assessment Specialist with deep knowledge of professional competencies 
+    across various industries. You evaluate technical skills, soft skills, and identify skill gaps. 
+    You provide detailed assessments of current skill levels, market demand for specific skills, and 
+    create personalized skill development roadmaps. You use industry frameworks and standards to ensure 
+    accurate and actionable assessments."""
 )
 
 
-def create_researcher_agent(
+def create_skills_assessment_agent(
     tools: Optional[Iterable[object]] = None,
     llm_overrides: dict[str, Any] | None = None,
 ) -> Agent:
-    """Create the researcher agent that fuses structured and unstructured sources."""
+    """Create the skills assessment agent for evaluating professional competencies."""
     return Agent(
-        name="---",  # e.g., "Insight Researcher"
-        role="",  # "Curate authoritative context for workshop deliverables"
-        goal="",  # "Blend RAG insights with verified web findings to back every recommendation"
+        name="Skills Analyzer",
+        role="Professional Skills Assessment Specialist",
+        goal="Conduct comprehensive skills assessments, identify strengths and gaps, and create actionable skill development plans aligned with career goals",
         backstory=(
-            "If any add a backstory here."
-            # "Placeholder: Replace with scenario-specific research focus during the workshop. "
-            # "You are rigorous about citations, fact-checking, and keeping insights actionable."
+            "You are a certified skills assessment professional with expertise in competency frameworks, "
+            "technical evaluations, and talent development. You have assessed thousands of professionals "
+            "across diverse industries including technology, business, healthcare, and creative fields. "
+            "Your assessments are known for being thorough, objective, and incredibly useful for career planning. "
+            "You understand both current market demands and future skill trends."
         ),
         llm=build_crewai_llm(**(llm_overrides or {})),
         allow_delegation=False,
         verbose=True,
         system_prompt=SYSTEM_PROMPT,
-        tools=list(tools or []),  # Call tools here
+        tools=list(tools or []),
     )

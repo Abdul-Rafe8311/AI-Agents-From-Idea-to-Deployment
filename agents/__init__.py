@@ -1,12 +1,12 @@
-"""Agent factory functions for the Agentic AI workshop."""
-from .planner import create_planner_agent
-from .researcher import create_researcher_agent
-from .writer import create_writer_agent
-from .reviewer import create_reviewer_agent
+"""Agent factory functions for the Career Advisor system."""
+from .planner import create_career_guidance_agent
+from .researcher import create_skills_assessment_agent
+from .writer import create_resume_builder_agent
+from .reviewer import create_course_recommendation_agent
 
 __all__ = [
-    "create_planner_agent",
-    "create_researcher_agent",
-    "create_writer_agent",
-    "create_reviewer_agent",
+    "create_career_guidance_agent",
+    "create_skills_assessment_agent",
+    "create_resume_builder_agent",
+    "create_course_recommendation_agent",
 ]

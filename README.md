@@ -1,69 +1,101 @@
-# Agentic AI Workshop: Multi-Agent Systems From Idea to Deployment
+# AI Career Advisor - Multi-Agent System
 
-A hands-on workshop template that demonstrates how to orchestrate CrewAI agents for planning, research, writing, and review workflows. The stack combines CrewAI with LangChain tools, a FAISS-backed Retrieval-Augmented Generation (RAG) pipeline, and a Streamlit frontend. All large language model calls are routed through the OpenRouter API using the model `meta-llama/llama-3.3-70b-instruct:free`.
+An intelligent career advisor powered by AI agents that provides personalized career guidance, skills assessment, resume building, and course recommendations.
 
-## Workshop Goals
+## Overview
 
-- Teach students how to structure multi-agent systems with CrewAI.
-- Illustrate how RAG augments agents with curated context via FAISS.
-- Showcase live web search and deterministic calculation tooling.
-- Provide an end-to-end example from initial idea to reviewed deliverable.
-- Offer a Streamlit interface that makes the pipeline demo-ready for classes and talks.
+This project uses CrewAI to orchestrate four specialized AI agents that work together to provide comprehensive career advice:
+
+1. **Career Guidance Agent** - Analyzes career profiles and recommends optimal career paths
+2. **Skills Assessment Agent** - Evaluates current skills and identifies gaps for target roles
+3. **Resume Builder Agent** - Creates ATS-optimized resumes tailored to career goals
+4. **Course Recommendation Agent** - Suggests personalized learning paths and resources
+
+## Features
+
+- 🎯 Personalized career path recommendations based on experience and goals
+- 📊 Comprehensive skills assessment with gap analysis
+- 📄 Professional, ATS-optimized resume generation
+- 📚 Curated course recommendations with structured learning roadmaps
+- 🔍 RAG-powered knowledge base with career development insights
+- 🌐 Web search integration for current market trends
+- 🖥️ Interactive Streamlit frontend
+
+## Architecture
+
+The system uses:
+- **CrewAI**: Multi-agent orchestration framework
+- **LangChain**: LLM integration and tool chaining
+- **FAISS**: Vector database for career knowledge retrieval
+- **OpenRouter**: Unified API for multiple LLM models (Meta Llama 3.3 70B)
+- **Streamlit**: Interactive web interface
 
 ## Project Structure
 
 ```
-agentic-workshop/
-├── .env.example
-├── requirements.txt
-├── README.md
-├── main.py
-├── crew.py
-├── tasks.py
-├── config/
-│   └── settings.py
-├── agents/
-│   ├── __init__.py
-│   ├── planner.py
-│   ├── researcher.py
-│   ├── writer.py
-│   └── reviewer.py
-├── tools/
-│   ├── __init__.py
-│   ├── rag_tool.py
-│   ├── web_search.py
-│   └── calculator.py
-├── rag/
-│   ├── build_vector_db.py
-│   ├── documents/
-│   │   └── sample_docs.txt
-│   └── vectorstore/
-└── frontend/
-   └── app.py
+AI-Agents-From-Idea-to-Deployment/
+├── agents/                    # Agent definitions
+│   ├── planner.py            # Career Guidance Agent
+│   ├── researcher.py         # Skills Assessment Agent
+│   ├── writer.py             # Resume Builder Agent
+│   └── reviewer.py           # Course Recommendation Agent
+├── config/                   # Configuration
+│   ├── settings.py          # LLM and API settings
+│   └── logging_config.py    # Logging configuration
+├── tools/                    # Agent tools
+│   ├── calculator.py        # Arithmetic calculations
+│   ├── rag_tool.py          # Career knowledge retrieval
+│   └── web_search.py        # Live web search (DuckDuckGo)
+├── rag/                      # RAG pipeline
+│   ├── build_vector_db.py   # Vector store builder
+│   └── documents/           # Knowledge base documents
+│       └── career_knowledge_base.txt
+├── frontend/                 # Streamlit UI
+│   └── app.py
+├── crew.py                   # Crew orchestration
+├── tasks.py                  # Task definitions
+├── main.py                   # CLI entrypoint
+└── requirements.txt          # Python dependencies
 ```
 
-## Built-in Agent Tooling
+## Agent Details
 
-Every agent in the crew (planner, researcher, writer, reviewer) receives the same trio of tools via `tools.get_default_toolkit()`:
+### 1. Career Guidance Agent
+- Analyzes user background, interests, and goals
+- Researches market trends and opportunities
+- Recommends 3-5 optimal career paths with justifications
+- Provides actionable next steps
 
-- `local_rag_search`: FAISS-backed retrieval over curated workshop documents for grounded answers.
-- `duckduckgo_search`: Live DuckDuckGo lookups when the topic needs current context or external validation.
-- `calculator`: A deterministic evaluator for quick math, metrics, or cost estimates referenced in drafts.
+### 2. Skills Assessment Agent
+- Evaluates technical and soft skills
+- Identifies skill gaps for target roles
+- Prioritizes skills by market demand
+- Creates structured development roadmap with timelines
 
-Having the shared toolkit means any role can validate facts or pull references without delegating to the researcher.
+### 3. Resume Builder Agent
+- Generates professional, ATS-optimized resumes
+- Highlights achievements with quantifiable metrics
+- Tailors content for specific career paths
+- Provides LinkedIn optimization tips
+
+### 4. Course Recommendation Agent
+- Recommends courses from top platforms (Coursera, Udemy, edX)
+- Suggests relevant certifications (AWS, Azure, Google Cloud)
+- Creates 3/6/12-month learning timelines
+- Includes free and paid resource alternatives
 
 ## Prerequisites
 
 - Python 3.10+
-- An OpenRouter account and API key (free tier available)
-- (Optional) A virtual environment manager such as `venv`, `conda`, or `pipenv`
+- OpenRouter API key ([Get one here](https://openrouter.ai/))
+- Virtual environment manager (venv, conda, or pipenv)
 
 ## Installation
 
 1. **Clone the repository**
    ```powershell
-   git clone https://github.com/your-org/agentic-workshop.git
-   cd agentic-workshop
+   git clone <repository-url>
+   cd AI-Agents-From-Idea-to-Deployment
    ```
 
 2. **Create and activate a virtual environment**
@@ -72,83 +104,181 @@ Having the shared toolkit means any role can validate facts or pull references w
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. **Install project dependencies**
+3. **Install dependencies**
    ```powershell
    pip install -r requirements.txt
    ```
 
 4. **Set up environment variables**
-   ```powershell
-   copy .env.example .env
-   # Edit .env and paste your actual OpenRouter API key
+   Create a `.env` file in the project root:
+   ```env
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
    ```
 
-5. **Build the FAISS vector store (one-time setup)**
+5. **Build the vector database**
    ```powershell
    python rag\build_vector_db.py
    ```
+   This processes `career_knowledge_base.txt` and creates a FAISS vector store.
 
-## Running the Backend Pipeline
+## Usage
 
-Execute the crew directly from the command line:
+### Command Line Interface
+
+Run the career advisor with a user profile:
 
 ```powershell
-python main.py --topic "Agentic AI Workshop on Robotics Deployments"
+python main.py --profile "I am a software developer with 3 years of experience in Python and web development. I'm interested in transitioning to AI/ML engineering."
 ```
 
-The script loads environment variables, constructs the CrewAI workflow, and prints the reviewed deliverable to stdout.
+### Streamlit Web Interface
 
-### Using `run_pipeline` Programmatically
-
-Import `run_pipeline` from `main.py` to embed the workflow inside other applications:
-
-```python
-from main import run_pipeline
-
-result = run_pipeline("Multi-Agent Workshop for Healthcare AI")
-print(result)
-```
-
-## Running the Streamlit Frontend
-
-Launch the UI from the virtual environment so Streamlit can resolve the backend packages:
+Launch the interactive web app:
 
 ```powershell
 python -m streamlit run frontend\app.py
 ```
 
-Enter a workshop topic in the sidebar and click **Run Pipeline**. The output panel displays the aggregated crew result when the run completes.
+Then open `http://localhost:8501` and enter your career profile.
 
-If you prefer to call the executable directly on Windows, use `.\.venv\Scripts\streamlit.exe run frontend\app.py` from the activated environment.
+## Example User Profiles
 
-## Customising Agents and Tasks
+**Career Transition:**
+```
+I'm a marketing manager with 5 years of experience. I want to transition into product management in tech. I have basic SQL skills and strong communication abilities.
+```
 
-- **Agent Prompts**: Update the placeholder system prompts in `agents/planner.py`, `agents/researcher.py`, `agents/writer.py`, and `agents/reviewer.py` to align with your scenario.
-- **Task Objectives**: Adjust the descriptions and expected outputs in `tasks.py` to fit new deliverables or grading rubrics.
-- **Tools**: Extend `tools/` with new integrations (e.g., GitHub search, deployment triggers) and register them in `tools/__init__.py` plus the relevant tasks.
-- **LLM Settings**: Tweak `config/settings.py` to experiment with temperatures, token limits, or alternative OpenRouter models.
-- **Knowledge Base**: Replace `rag/documents/sample_docs.txt` with your own corpus and re-run `python rag\build_vector_db.py`.
+**Skill Upgrade:**
+```
+Backend developer with 2 years Java/Spring experience. Want to learn cloud architecture and get AWS certified to move into senior roles.
+```
 
-## Deploying the System
+**Career Starter:**
+```
+Recent computer science graduate. Strong in Python and algorithms. Interested in data science or machine learning engineering. Need guidance on first role.
+```
 
-- **Streamlit Community Cloud**: Upload the repo, set environment variables (`OPENROUTER_API_KEY`, optional fallbacks) in the project settings, and ensure `requirements.txt` is listed as the sole dependency file.
-- **Containerised App**: Package the CLI and Streamlit UI inside a Docker image (start from `python:3.11-slim`, copy the repo, install requirements, expose port 8501). Deploy to Azure App Service, AWS App Runner, or Google Cloud Run.
-- **API Gateway**: Wrap `run_workshop_pipeline` with FastAPI or Flask to expose a `/run` endpoint, then host behind a queue/worker on ECS, Azure Container Apps, or Fly.io for managed execution.
-- **Enterprise Integration**: For internal workshops, schedule the pipeline via orchestration tools (Airflow, Prefect) and archive outputs to cloud storage, allowing instructors to diff successive runs.
+## Configuration
 
-## Troubleshooting Tips
+### LLM Settings
 
-- **Missing Vector Store**: If the research task fails to load the FAISS index, ensure `rag/vectorstore/` contains the generated files. Re-run the build script if needed.
-- **Authentication Errors**: Double-check that `OPENROUTER_API_KEY` is present in your environment. The app raises an explicit error if it is missing.
-- **Dependency Issues**: Match the Python version requirement and reinstall with `pip install --upgrade -r requirements.txt` when packages change.
+Edit `config/settings.py` to customize:
+- Model selection (default: Meta Llama 3.3 70B)
+- Temperature and max tokens
+- Fallback models and base URLs
 
-## Next Steps for Students
-Each student in a group should take an agent and then write its prompt.
-1. Try to develop a simple crew AI chain for any basic task. (Like Research, Newsroom, Study Companion and sky is the limit)
-2. Add or Remove an Agent
-3. Try to make a new tool, like drawing maker. (Hint use canvas and LLM written code to draw lines on it)
-4. Try Deploying
-5. Play around with Prompts
-Run the pipeline ;)
+### Knowledge Base
 
-Happy building! Customize freely to turn this template into a polished workshop experience.
+The career knowledge base includes:
+- Career paths and opportunities across tech roles
+- Skills assessment frameworks and in-demand skills
+- Resume building best practices and ATS optimization
+- Course recommendations and learning platforms
+- Job search strategies and interview preparation
+- Industry insights and salary information
+
+To add custom content:
+1. Add `.txt` files to `rag/documents/`
+2. Rebuild vector store: `python rag\build_vector_db.py`
+
+## Customization
+
+### Adding New Agents
+
+1. Create agent file in `agents/` with system prompt, role, goal, backstory
+2. Add import to `agents/__init__.py`
+3. Update `crew.py` to include in crew assembly
+4. Add corresponding task in `tasks.py`
+
+### Adding New Tools
+
+1. Create tool class in `tools/` extending `BaseTool`
+2. Implement `_run()` method
+3. Add to `tools/__init__.py`
+4. Include in `get_default_toolkit()` if needed for all agents
+
+## Troubleshooting
+
+**Vector store not found:**
+```powershell
+python rag\build_vector_db.py
+```
+
+**API key errors:**
+Ensure `.env` contains valid `OPENROUTER_API_KEY`
+
+**Import errors:**
+```powershell
+pip install -r requirements.txt
+```
+
+**Streamlit connection issues:**
+Use `python -m streamlit run frontend\app.py` instead of direct `streamlit` command
+
+## Technologies Used
+
+- **CrewAI 0.37+**: Agent orchestration
+- **LangChain**: LLM framework and tools
+- **OpenRouter**: Multi-model API access
+- **FAISS**: Vector similarity search
+- **Sentence Transformers**: Text embeddings
+- **DuckDuckGo Search**: Web search integration
+- **Streamlit**: Web interface
+- **Python 3.10+**: Core language
+
+## Deployment
+
+### Streamlit Community Cloud
+1. Push repository to GitHub
+2. Connect to Streamlit Cloud
+3. Set `OPENROUTER_API_KEY` in secrets
+4. Deploy from `frontend/app.py`
+
+### Docker Containerization
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+RUN python rag/build_vector_db.py
+EXPOSE 8501
+CMD ["streamlit", "run", "frontend/app.py"]
+```
+
+### Cloud Platforms
+- **Azure**: Azure Container Apps or App Service
+- **AWS**: ECS, App Runner, or Lambda
+- **GCP**: Cloud Run or App Engine
+
+## Development Roadmap
+
+Future enhancements:
+- [ ] Integration with LinkedIn API for profile import
+- [ ] PDF resume export with customizable templates
+- [ ] Email delivery of career reports
+- [ ] Multi-language support
+- [ ] Interview preparation module
+- [ ] Salary negotiation guidance
+- [ ] Job matching recommendations
+- [ ] Progress tracking dashboard
+
+## Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with tests
+4. Submit a pull request
+
+## License
+
+See LICENSE file for details.
+
+## Acknowledgments
+
+Built with CrewAI, LangChain, and OpenRouter for intelligent career guidance through multi-agent AI systems.
+
+---
+
+**Need career advice?** Run the system and let our AI agents help guide your career journey! 🚀

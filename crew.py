@@ -1,4 +1,4 @@
-#"""Crew assembly for the Agentic AI Workshop."""
+#"""Crew assembly for the Career Advisor system."""
 from __future__ import annotations
 
 import logging
@@ -7,40 +7,40 @@ from typing import Any
 from crewai import Crew, Process
 
 from agents import (
-    create_planner_agent,
-    create_researcher_agent,
-    create_reviewer_agent,
-    create_writer_agent,
+    create_career_guidance_agent,
+    create_skills_assessment_agent,
+    create_resume_builder_agent,
+    create_course_recommendation_agent,
 )
 from config.settings import OpenRouterLLMConfig
-from tasks import build_workshop_tasks
+from tasks import build_career_advisor_tasks
 from tools import get_default_toolkit
 
 logger = logging.getLogger(__name__)
 
 
-def create_workshop_crew(llm_overrides: dict[str, Any] | None = None) -> Crew:
-    """Instantiate crew with placeholder agents, tasks, and tools."""
-    planner_tools = get_default_toolkit()
-    research_tools = get_default_toolkit()
-    writer_tools = get_default_toolkit()
-    reviewer_tools = get_default_toolkit()
+def create_career_advisor_crew(llm_overrides: dict[str, Any] | None = None) -> Crew:
+    """Instantiate career advisor crew with specialized agents, tasks, and tools."""
+    guidance_tools = get_default_toolkit()
+    assessment_tools = get_default_toolkit()
+    resume_tools = get_default_toolkit()
+    course_tools = get_default_toolkit()
 
-    planner = create_planner_agent(tools=planner_tools, llm_overrides=llm_overrides)
-    researcher = create_researcher_agent(tools=research_tools, llm_overrides=llm_overrides)
-    writer = create_writer_agent(tools=writer_tools, llm_overrides=llm_overrides)
-    reviewer = create_reviewer_agent(tools=reviewer_tools, llm_overrides=llm_overrides)
+    career_guidance_agent = create_career_guidance_agent(tools=guidance_tools, llm_overrides=llm_overrides)
+    skills_assessment_agent = create_skills_assessment_agent(tools=assessment_tools, llm_overrides=llm_overrides)
+    resume_builder_agent = create_resume_builder_agent(tools=resume_tools, llm_overrides=llm_overrides)
+    course_recommendation_agent = create_course_recommendation_agent(tools=course_tools, llm_overrides=llm_overrides)
 
-    tasks = build_workshop_tasks(
-        planner,
-        researcher,
-        writer,
-        reviewer,
-        research_tools=research_tools,
+    tasks = build_career_advisor_tasks(
+        career_guidance_agent,
+        skills_assessment_agent,
+        resume_builder_agent,
+        course_recommendation_agent,
+        assessment_tools=assessment_tools,
     )
 
     return Crew(
-        agents=[planner, researcher, writer, reviewer],
+        agents=[career_guidance_agent, skills_assessment_agent, resume_builder_agent, course_recommendation_agent],
         tasks=tasks,
         process=Process.sequential,
         verbose=True,
@@ -101,20 +101,20 @@ def _sanitize_overrides(overrides: dict[str, Any]) -> dict[str, Any]:
 
 
 def _execute_crew(
-    topic: str, overrides: dict[str, Any], config: OpenRouterLLMConfig
+    user_profile: str, overrides: dict[str, Any], config: OpenRouterLLMConfig
 ) -> str:
-    crew = create_workshop_crew(llm_overrides=overrides)
+    crew = create_career_advisor_crew(llm_overrides=overrides)
     provider_label = overrides.get("provider", "openrouter-liteLLM")
     model_label = overrides.get("model", config.model)
     base_url_label = overrides.get("base_url", config.base_url)
     logger.info(
-        "Crew kickoff started for topic: %s (provider=%s model=%s base_url=%s)",
-        topic,
+        "Crew kickoff started for user profile: %s (provider=%s model=%s base_url=%s)",
+        user_profile[:100] + "..." if len(user_profile) > 100 else user_profile,
         provider_label,
         model_label,
         base_url_label,
     )
-    result = crew.kickoff(inputs={"topic": topic})
+    result = crew.kickoff(inputs={"user_profile": user_profile})
 
     for task in crew.tasks:
         task_output = getattr(task, "output", None)
@@ -136,8 +136,8 @@ def _execute_crew(
     return output_text
 
 
-def run_workshop_pipeline(topic: str) -> str:
-    """Run the crew for a given workshop topic with OpenRouter fallback attempts."""
+def run_career_advisor_pipeline(user_profile: str) -> str:
+    """Run the career advisor crew for a given user profile with OpenRouter fallback attempts."""
 
     config = OpenRouterLLMConfig()
     attempts = _build_llm_attempts(config)
@@ -154,7 +154,7 @@ def run_workshop_pipeline(topic: str) -> str:
                     total_attempts,
                     _sanitize_overrides(overrides),
                 )
-            result = _execute_crew(topic, overrides, config)
+            result = _execute_crew(user_profile, overrides, config)
             if index > 1:
                 logger.info(
                     "Fallback succeeded on attempt %d/%d with overrides: %s",
